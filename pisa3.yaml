@@ -1,0 +1,80 @@
+--- 
+   appBinary: open -a MacPyMOL
+   appCaption: "Open in PyMol"
+   appContext: edge
+   dataMatrixFile: graph.txt
+   scriptLines: |
+      cd /Users/ofer/Documents/Dropbox/Uni/Research/files/graph 
+      edgeNumber=%edge%
+      edgeNumberList=[]
+      edgeNumberListTemp=[]
+      stline=""
+      with open("LocationGraph.txt") as f: content = f.readlines()
+      for line in content: stline=line.split(" ")[0], edgeNumberListTemp.append(stline)
+      del edgeNumberListTemp[0]
+      edgeNumberListTemp[0]=("0", "0")
+      for i in edgeNumberListTemp: edgeNumberList.append(int(i[0]))
+      edgeLine=-1
+      js=list(range(len(edgeNumberList)))
+      for j in js:\
+         if int(edgeNumberList[j]) == edgeNumber: edgeLine=j
+      locations=content[edgeLine]
+      proteins=locations.split(" ")
+      proteins=proteins[1].split("|")
+      protein0=proteins[0].split(".")
+      proteinName="pdbs/"+protein0[0]+".pdb"
+      cmd.load(proteinName)
+      set ignore_case, 0
+      color grey, all
+      cmd.select("peps", "resi " +protein0[1]+"+"+protein0[2]+"+"+protein0[3]+"+"+protein0[4]+"+"+protein0[5]+"+"+protein0[6]+"+"+protein0[7]+"+"+protein0[8])
+      color red, peps
+      show cartoon
+      deselect
+      cmd.distance("ho1", "i. "+protein0[1]+" and n. N", "i. "+protein0[2]+" and n. O", 10.0, 2)
+      cmd.distance("ho2", "i. "+protein0[3]+" and n. N", "i. "+protein0[4]+" and n. O", 10.0, 2)
+      cmd.distance("ho3", "i. "+protein0[5]+" and n. N", "i. "+protein0[6]+" and n. O", 10.0, 2)
+      cmd.distance("ho4", "i. "+protein0[7]+" and n. N", "i. "+protein0[8]+" and n. O", 10.0, 2)
+      cmd.origin("resi " +protein0[1])
+      center origin
+      zoom center, 20
+      print protein0
+      
+
+   suffix: pml
+   type: script
+//The source interaction of the graph must be the key of the pair
+
+--- 
+   appBinary: open -a MacPyMOL
+   appCaption: "Open in PyMol (Full structure)"
+   appContext: edge
+   dataMatrixFile: graph fixed.txt
+   scriptLines: |
+      cd /Users/ofer/Documents/IntelliJ/SPDBV_4.1.0_OSX/pdbs	
+      location=%edge%
+      proteins=location.split("|")
+      protein0=proteins[0].split(".")
+      proteinName=protein0[0]+".pdb"
+
+      cmd.load(proteinName)
+      set ignore_case, 0
+
+      select chain1_%chain1%, chain %chain1%
+      select ifres1, (chain1_%chain1% and resi %H_START%%res1%,%H_END%none) 
+      select chain2_%chain2%, chain %chain2%
+      select ifres2, (chain2_%chain2% and resi %H_START%%res2%,%H_END%none) 
+      hide all
+      show cartoon
+      color gray
+      show cartoon, chain1_%chain1% 
+      color cyan, chain1_%chain1%
+      show spheres, ifres1
+      color blue, ifres1
+      show cartoon, chain2_%chain2%   
+      color orange, chain2_%chain2%
+      show spheres, ifres2
+      color red, ifres2
+      orient chain1_%chain1% chain2_%chain2%
+      deselect
+   suffix: pml
+   type: script
